@@ -1,2 +1,8 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Не учитывать сгенерированную Folium-карту в языковой статистике репозитория
+outputs/accessibility_map.html linguist-generated=true
+
+# Всю папку outputs пометить как документацию/вспомогательные файлы
+outputs/** linguist-documentation=true
+
+# Ноутбук считать за исходный код (учитывать в статистике)
+*.ipynb linguist-detectable=true

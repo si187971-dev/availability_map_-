@@ -13,13 +13,13 @@
 ## 🗺️ Демо
 
 <!-- Замените на свои скриншоты из outputs/ -->
-![Карта доступности](https://si187971-dev.github.io/accessibility/outputs/maps/accessibility_overview.png)
+![Карта доступности](outputs/maps/accessibility_overview.png)
 
-*Интерактивная версия: [`accessibility_map.html`](https://si187971-dev.github.io/accessibility/outputs/accessibility_map.html) — слои можно включать/выключать.*
+*Интерактивная версия: [`accessibility_map.html`](outputs/accessibility_map.html) — слои можно включать/выключать.*
 
 | Зоны доступа | Дефицитные районы |
 |---|---|
-| ![изохроны](https://si187971-dev.github.io/accessibility/outputs/maps/isochrones.png) | ![пустыни](https://si187971-dev.github.io/accessibility/outputs/maps/deserts.png) |
+| ![изохроны](outputs/maps/isochrones.png) | ![пустыни](outputs/maps/deserts.png) |
 
 ---
 
@@ -70,7 +70,6 @@ PLACE = "Saint Petersburg, Russia"
 PLACE = "Vasileostrovsky District, Saint Petersburg, Russia"
 ```
 
-<<<<<<< HEAD
 > ⚠️ Полный граф мегаполиса — сотни тысяч узлов. Для первого запуска и скриншотов
 > рекомендуется один район: считается за секунды и надёжно влезает в память Colab.
 
@@ -91,17 +90,60 @@ PLACE = "Vasileostrovsky District, Saint Petersburg, Russia"
 
 ---
 
+## 🐍 Использование модулей
+
+Весь анализ можно собрать из функций `src/` без ноутбука:
+
+```python
+from src.network import load_walk_network, load_services, snap_services_to_nodes
+from src.isochrones import compute_access_times, build_isochrones
+from src.analysis import coverage_metrics, best_new_location
+
+PLACE = "Vasileostrovsky District, Saint Petersburg, Russia"
+TAGS = {
+    "hospital": {"amenity": "hospital"},
+    "school":   {"amenity": "school"},
+    "park":     {"leisure": "park"},
+}
+
+# 1. Сеть и сервисы
+G = load_walk_network(PLACE, walk_speed_kmh=4.5)
+services = load_services(PLACE, TAGS)
+service_nodes = snap_services_to_nodes(G, services)
+
+# 2. Времена доступа и изохроны (порог 15 минут)
+access_times = compute_access_times(G, service_nodes, cutoff=15)
+isochrones = build_isochrones(G, access_times, buffer_m=40)
+
+# 3. Метрики покрытия и рекомендация размещения новой больницы
+metrics, deserts = coverage_metrics(PLACE, isochrones)
+node, gain = best_new_location(G, access_times["hospital"], cutoff=15)
+
+print(metrics)
+print(f"Кандидат под новую больницу: узел {node}, охват +{gain} узлов")
+```
+
+---
+
 ## 📁 Структура репозитория
 
 ```
 urban-accessibility/
 ├── README.md
-├── urban_accessibility_analysis.ipynb   # основной ноутбук
+├── urban_accessibility_analysis.ipynb   # демо: полный пайплайн по шагам
+├── src/                                # переиспользуемая логика
+│   ├── network.py                      # загрузка сети и сервисов из OSM
+│   ├── isochrones.py                   # расчёт времени в пути и изохрон
+│   └── analysis.py                     # метрики, дефицит, рекомендация
 ├── outputs/
-│   ├── https://si187971-dev.github.io/accessibility/accessibility_map.html           # интерактивная карта
+│   ├── accessibility_map.html           # интерактивная карта
 │   └── maps/                            # PNG-скриншоты для README
+├── .gitattributes                      # карта исключена из языковой статистики
 └── requirements.txt
 ```
+
+Ноутбук — это демонстрация пайплайна по шагам; переиспользуемая логика вынесена
+в модули `src/`, чтобы функции можно было импортировать и тестировать отдельно.
 
 ---
 
@@ -120,6 +162,3 @@ urban-accessibility/
 - Замена прокси населения на растр WorldPop с зональной статистикой (`rasterio`).
 - Учёт общественного транспорта (GTFS) для мультимодальной доступности.
 - Индекс равенства доступа (сопоставление покрытия с доходами районов).
-=======
-```
->>>>>>> 47f926e57e8ae26a1c1504b6e5fa9db4b65d33fe
