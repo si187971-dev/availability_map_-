@@ -7,6 +7,7 @@ from shapely.geometry import MultiPoint
 from shapely.ops import unary_union
 import folium
 import warnings
+import os
 warnings.filterwarnings("ignore")
 
 # настройки OSM
@@ -206,3 +207,5 @@ if node:
     print(f"Охватит ~{gain:,} ранее недоступных перекрёстков за {CUTOFF} мин пешком.")
 else:
     print("Весь город уже покрыт — новая больница не требуется по этому критерию.")
+
+    print("Карта сохранена в:", os.path.abspath("accessibility_map.html"))
