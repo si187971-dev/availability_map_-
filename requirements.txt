@@ -1,0 +1,7 @@
+osmnx>=2.0
+geopandas>=1.0
+networkx>=3.0
+folium>=0.16
+shapely>=2.0
+mapclassify>=2.6
+contextily>=1.5
